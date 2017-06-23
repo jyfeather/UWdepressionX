@@ -51,7 +51,9 @@ def a_spectral(l):
     return (scipy.stats.gmean(l)/np.mean(l))
 
 def a_dct(l):
-    return dct(l, type=2).tolist()[:10]
+    tmp = dct(l, type=2)
+    tmp_idx = sorted(range(len(tmp)), key=lambda k: -abs(tmp[k]))
+    return tmp[tmp_idx[:10]].tolist()
 
 '''
 parameters

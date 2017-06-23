@@ -12,6 +12,8 @@ import pandas as pd
 import re
 import os
 import csv
+from afinn import Afinn
+import numpy as np
 
 '''
 functions definitions
@@ -54,8 +56,17 @@ with open(dirpath + 'text_fea.csv', 'w') as outfile:
         # read file
         df_orig = pd.read_csv(''.join([dirpath, filepath]), sep = '\t')
         
-        # get data of participant
+        # get sentence level data of participant
         df_part = df_orig.loc[df_orig.speaker=='Participant']
+        
+        # sentiment analysis for sentences
+        afinn = Afinn()
+        try:        
+            list_afinn = [afinn.score(x) for x in df_part.value.tolist()]   
+        except:
+            pass
+        fea_list += [np.mean(list_afinn), np.median(list_afinn), np.max(list_afinn), \
+                     np.min(list_afinn), np.std(list_afinn)]        
         
         num_sentence = df_part.shape[0]
         
@@ -80,7 +91,7 @@ with open(dirpath + 'text_fea.csv', 'w') as outfile:
         
         fea_dep_ratio = len(word_set & dep_set) / num_word
         
-        fea_list = [fea_dep_ratio, fea_laug_ratio, fea_sent_ratio, fea_word_ratio]
+        fea_list += [fea_dep_ratio, fea_laug_ratio, fea_sent_ratio, fea_word_ratio]
         fea_list = [round(x, 3) for x in fea_list]
     
         wr.writerow(fea_list)
