@@ -3,26 +3,24 @@
 """
 Created on Wed Jun 28 14:01:29 2017
 
-Prediction
+Prediction with scikit-learn
 
 @author: Yan Jin
 """
 
-import h2o
-from h2o.estimators.random_forest import H2ORandomForestEstimator
-from h2o.estimators.gbm import H2OGradientBoostingEstimator
-
-h2o.init()
-#h2o.ls()
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
+import pandas as pd
+import numpy as np
 
 '''
 load data files
 '''
-train_audio = h2o.import_file(path = '/Users/mac/Downloads/avec2017/audio_fea_train_score.csv',\
-                              header = 1)
+train = pd.read_csv('/Users/mac/Downloads/avec2017/text_fea_train.csv',\
+                              header = 0)
 #train_audio.describe()
-dev_audio = h2o.import_file(path = '/Users/mac/Downloads/avec2017/audio_fea_dev_score.csv',\
-                            header = 1)
+dev = pd.read_csv('/Users/mac/Downloads/avec2017/text_fea_dev.csv',\
+                            header = 0)
 
 #train_audio[[1,2,3]].head()
 
@@ -30,33 +28,42 @@ dev_audio = h2o.import_file(path = '/Users/mac/Downloads/avec2017/audio_fea_dev_
 preprocessing before running models
 '''
 # train, test split
-train_audio, valid_audio = train_audio.split_frame(ratios=[0.75], seed=1)
+train['is_train'] = np.random.uniform(0, 1, len(train)) <= .75
+train, valid = train[train['is_train']==True], train[train['is_train']==False]
+
 #train_audio.shape
-no_x_audio = len(train_audio.columns)
-x_audio = train_audio.columns[:no_x_audio-1]
-y_audio = train_audio.columns[no_x_audio-1]
+no_x = len(train.columns)
+x = train.columns[1:no_x-3]
+y = train.columns[no_x-2]
 
 '''
 modelling
 '''
 # model initialization
-rf_audio = H2ORandomForestEstimator(seed=12, ntrees=50, max_depth= 20, \
-                                       balance_classes=False, nfolds = 5, \
-                                       stopping_metric = 'MSE')
-
-gbm_audio = H2OGradientBoostingEstimator(ntrees = 50, max_depth = 20, \
-                                         distribution = 'AUTO', nfolds = 5, \
-                                         stopping_metric = 'MSE')
+rf = RandomForestRegressor(n_estimators = 50, criterion = 'mse',\
+                           n_jobs = -1)
 
 # model training
-model_audio = gbm_audio
-model_audio.train(x=x_audio, y=y_audio, training_frame=train_audio, validation_frame=valid_audio)
+rf.fit(train[x], train[y])
 
 #model_audio.show()
 
 '''
 performance checking
 '''
-dev_pred = model_audio.predict(dev_audio)
-dev_perf = model_audio.model_performance(dev_audio)
-dev_perf.show()
+dev_pred = rf.predict(dev[x])
+#dev_pred2 = model_audio.predict_leaf_node_assignment(dev_audio)
+#h2o.download_csv(dev_pred, '/Users/mac/Downloads/test.csv')
+rmse = np.sqrt(np.mean((dev.score - dev_pred)**2))
+mae = mean_absolute_error(dev.score, dev_pred)
+
+'''
+each tree prediction
+'''
+per_tree_pred = [tree.predict(dev[x]) for tree in rf.estimators_]
+
+per_tree_df = pd.DataFrame(per_tree_pred)
+per_tree_sd = list()
+for i in range(len(per_tree_df.columns)):
+    per_tree_sd.append(np.std(per_tree_df[[i]]))
+
