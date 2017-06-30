@@ -9,18 +9,23 @@ Prediction with scikit-learn
 """
 
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import f1_score
 import pandas as pd
 import numpy as np
 
 '''
+preset
+'''
+isClassification = 1
+
+'''
 load data files
 '''
-train = pd.read_csv('/Users/mac/Downloads/avec2017/text_fea_train.csv',\
-                              header = 0)
+train = pd.read_csv('/Users/mac/Downloads/avec2017/text_fea_train.csv', header = 0)
 #train_audio.describe()
-dev = pd.read_csv('/Users/mac/Downloads/avec2017/text_fea_dev.csv',\
-                            header = 0)
+dev = pd.read_csv('/Users/mac/Downloads/avec2017/text_fea_dev.csv', header = 0)
 
 #train_audio[[1,2,3]].head()
 
@@ -34,17 +39,25 @@ train, valid = train[train['is_train']==True], train[train['is_train']==False]
 #train_audio.shape
 no_x = len(train.columns)
 x = train.columns[1:no_x-3]
-y = train.columns[no_x-2]
+if isClassification == 1:
+    y = train.columns[no_x-3]
+else:
+    y = train.columns[no_x-2]
 
 '''
 modelling
 '''
 # model initialization
-rf = RandomForestRegressor(n_estimators = 50, criterion = 'mse',\
-                           n_jobs = -1)
+if isClassification == 1:
+    rf = RandomForestClassifier(n_estimators = 50, n_jobs = -1)
+else:
+    rf = RandomForestRegressor(n_estimators = 50, criterion = 'mse', n_jobs = -1)
 
 # model training
-rf.fit(train[x], train[y])
+if isClassification == 1:
+    rf.fit(train[x], train[y].astype('category'))
+else:
+    rf.fit(train[x], train[y])
 
 #model_audio.show()
 
@@ -54,8 +67,12 @@ performance checking
 dev_pred = rf.predict(dev[x])
 #dev_pred2 = model_audio.predict_leaf_node_assignment(dev_audio)
 #h2o.download_csv(dev_pred, '/Users/mac/Downloads/test.csv')
-rmse = np.sqrt(np.mean((dev.score - dev_pred)**2))
-mae = mean_absolute_error(dev.score, dev_pred)
+
+if isClassification == 1:
+    f1 = f1_score(dev.binary, dev_pred)
+else:
+    rmse = np.sqrt(np.mean((dev.score - dev_pred)**2))
+    mae = mean_absolute_error(dev.score, dev_pred)
 
 '''
 each tree prediction
