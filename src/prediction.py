@@ -65,6 +65,7 @@ else:
 performance checking
 '''
 dev_pred = rf.predict(dev[x])
+
 #dev_pred2 = model_audio.predict_leaf_node_assignment(dev_audio)
 #h2o.download_csv(dev_pred, '/Users/mac/Downloads/test.csv')
 
@@ -77,10 +78,12 @@ else:
 '''
 each tree prediction
 '''
-per_tree_pred = [tree.predict(dev[x]) for tree in rf.estimators_]
-
-per_tree_df = pd.DataFrame(per_tree_pred)
-per_tree_sd = list()
-for i in range(len(per_tree_df.columns)):
-    per_tree_sd.append(np.std(per_tree_df[[i]]))
-
+if isClassification == 0:
+    per_tree_pred = [tree.predict(dev[x]) for tree in rf.estimators_]
+    
+    per_tree_df = pd.DataFrame(per_tree_pred)
+    per_tree_sd = list()
+    for i in range(len(per_tree_df.columns)):
+        per_tree_sd.append(np.std(per_tree_df[[i]]))
+else: 
+    dev_pred_proba = rf.predict_proba(dev[x])
