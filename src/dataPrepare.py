@@ -49,17 +49,13 @@ plt.hist(list_dev['PHQ8_Binary'])
 plt.hist(list_train['PHQ8_Score'])
 plt.hist(list_dev['PHQ8_Score'])
 
-# dump binary audio only
-fea_audio_train['y'] = pd.factorize(list_train['PHQ8_Binary'])[0]
-fea_audio_dev['y'] = pd.factorize(list_dev['PHQ8_Binary'])[0]
-fea_audio_train.to_csv('/Users/mac/Downloads/avec2017/audio_fea_train_binary.csv')
-fea_audio_dev.to_csv('/Users/mac/Downloads/avec2017/audio_fea_dev_binary.csv')
-
-# dump score audio only
-fea_audio_train['y'] = pd.factorize(list_train['PHQ8_Score'])[0]
-fea_audio_dev['y'] = pd.factorize(list_dev['PHQ8_Score'])[0]
-fea_audio_train.to_csv('/Users/mac/Downloads/avec2017/audio_fea_train_score.csv')
-fea_audio_dev.to_csv('/Users/mac/Downloads/avec2017/audio_fea_dev_score.csv')
+# dump audio only
+fea_audio_train['binary'] = pd.factorize(list_train['PHQ8_Binary'])[0]
+fea_audio_dev['binary'] = pd.factorize(list_dev['PHQ8_Binary'])[0]
+fea_audio_train['score'] = pd.factorize(list_train['PHQ8_Score'])[0]
+fea_audio_dev['score'] = pd.factorize(list_dev['PHQ8_Score'])[0]
+fea_audio_train.to_csv('/Users/mac/Downloads/avec2017/audio_fea_train.csv')
+fea_audio_dev.to_csv('/Users/mac/Downloads/avec2017/audio_fea_dev.csv')
 
 # dump binary & score, text only
 fea_text_train['binary'] = pd.factorize(list_train['PHQ8_Binary'])[0]
