@@ -50,10 +50,10 @@ def a_iqr(l):
 def a_spectral(l):
     return (scipy.stats.gmean(l)/np.mean(l))
 
-def a_dct(l):
+def a_dct(l, m):
     tmp = dct(l, type=2)
     tmp_idx = sorted(range(len(tmp)), key=lambda k: -abs(tmp[k]))
-    return tmp[tmp_idx[:10]].tolist()
+    return tmp[tmp_idx[:m]].tolist()
 
 '''
 parameters
@@ -88,18 +88,18 @@ with open(dirpath + 'audio_fea.csv', 'w') as outfile:
                 fea_list += [a_mean(l_norm), a_min(l_norm), a_skewness(l_norm), a_kurtosis(l_norm), \
                                 a_sd(l_norm), a_median(l_norm), a_rms(l_norm), a_peak_rms(l_norm), \
                                 a_iqr(l_norm), a_spectral(l_norm)]
-                fea_list += a_dct(l)
+                fea_list += a_dct(l, 10)
             elif col < 36:
                 fea_list += [a_mean(l), a_sd(l), a_peak_rms(l), a_rms(l), a_iqr(l), a_spectral(l)]
-                fea_list += a_dct(l)
+                fea_list += a_dct(l, 10)
             elif col < 74:
                 fea_list += [a_mean(l), a_sd(l), a_rms(l), a_iqr(l)]
-                fea_list += a_dct(l)
+                fea_list += a_dct(l, 10)
         
         for col in df_orig2:
             l = df_orig[col].tolist()
             fea_list += [a_mean(l), a_sd(l), a_peak_rms(l), a_rms(l), a_iqr(l), a_spectral(l)]
-            fea_list += a_dct(l)
+            fea_list += a_dct(l, 10)
             
         fea_list = [round(x, 3) for x in fea_list]
         

@@ -19,8 +19,8 @@ import numpy as np
 '''
 preset
 '''
-isClassification = 1
-isText = 1
+isClassification = 0
+isText = 0
 
 '''
 load data files
@@ -114,3 +114,13 @@ if isClassification == 0:
         per_tree_sd.append(np.std(per_tree_df[[i]]))
 else: 
     dev_pred_proba = rf.predict_proba(dev[x])
+    
+'''
+temporary confidence fusion 
+'''
+dev_pred2 = list()
+for i in range(len(text_sd)):
+    if float(audio_sd[i]) >= 5.5:
+        dev_pred2.append(text_pred[i])
+    else:
+        dev_pred2.append(audio_pred[i])
