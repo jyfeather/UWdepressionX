@@ -8,6 +8,8 @@ prediction
 @author: yan jin
 """
 
+#%reset
+
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
@@ -44,16 +46,18 @@ fea_audio_test = fea_audio.loc[[i in list_test['participant_ID'].tolist() for i 
 fea_text_test = fea_text.loc[[i in list_test['participant_ID'].tolist() for i in list_fold],]
 
 # distribution illustration
-plt.hist(list_train['PHQ8_Binary'])
-plt.hist(list_dev['PHQ8_Binary'])
-plt.hist(list_train['PHQ8_Score'])
-plt.hist(list_dev['PHQ8_Score'])
+#plt.hist(list_train['PHQ8_Binary'])
+#plt.hist(list_dev['PHQ8_Binary'])
+#plt.hist(list_train['PHQ8_Score'])
+#plt.hist(list_dev['PHQ8_Score'])
 
 # dump audio only
 fea_audio_train['binary'] = pd.factorize(list_train['PHQ8_Binary'])[0]
 fea_audio_dev['binary'] = pd.factorize(list_dev['PHQ8_Binary'])[0]
 fea_audio_train['score'] = pd.factorize(list_train['PHQ8_Score'])[0]
 fea_audio_dev['score'] = pd.factorize(list_dev['PHQ8_Score'])[0]
+fea_audio_train['gender'] = pd.factorize(list_train['Gender'])[0]
+fea_audio_dev['gender'] = pd.factorize(list_dev['Gender'])[0]
 fea_audio_train.to_csv('/Users/mac/Downloads/avec2017/audio_fea_train.csv')
 fea_audio_dev.to_csv('/Users/mac/Downloads/avec2017/audio_fea_dev.csv')
 
@@ -62,21 +66,23 @@ fea_text_train['binary'] = pd.factorize(list_train['PHQ8_Binary'])[0]
 fea_text_train['score'] = pd.factorize(list_train['PHQ8_Score'])[0]
 fea_text_dev['binary'] = pd.factorize(list_dev['PHQ8_Binary'])[0]
 fea_text_dev['score'] = pd.factorize(list_dev['PHQ8_Score'])[0]
+fea_text_train['gender'] = pd.factorize(list_train['Gender'])[0]
+fea_text_dev['gender'] = pd.factorize(list_dev['Gender'])[0]
 fea_text_train.to_csv('/Users/mac/Downloads/avec2017/text_fea_train.csv')
 fea_text_dev.to_csv('/Users/mac/Downloads/avec2017/text_fea_dev.csv')
 
 """
     predictive modeling
 """
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import f1_score
-
-y = pd.factorize(list_train['PHQ8_Binary'])[0]
-
-clf = RandomForestClassifier()
-#clf.fit(fea_text_train, y).score(fea_text_train, y)
-clf.fit(fea_audio_train, y)
-
-pd.crosstab(clf.predict(fea_text_dev), list_dev['PHQ8_Binary'], rownames=['pred'], colnames=['actual'])
-list(zip(fea_text_train, clf.feature_importances_))
-f1_score(clf.predict(fea_text_dev), list_dev['PHQ8_Binary'])
+#from sklearn.ensemble import RandomForestClassifier
+#from sklearn.metrics import f1_score
+#
+#y = pd.factorize(list_train['PHQ8_Binary'])[0]
+#
+#clf = RandomForestClassifier()
+##clf.fit(fea_text_train, y).score(fea_text_train, y)
+#clf.fit(fea_audio_train, y)
+#
+#pd.crosstab(clf.predict(fea_text_dev), list_dev['PHQ8_Binary'], rownames=['pred'], colnames=['actual'])
+#list(zip(fea_text_train, clf.feature_importances_))
+#f1_score(clf.predict(fea_text_dev), list_dev['PHQ8_Binary'])

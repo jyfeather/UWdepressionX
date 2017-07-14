@@ -72,10 +72,12 @@ with open(dirpath + 'audio_fea.csv', 'w') as outfile:
         print(filepath)
         
         filepath2 = fold + '/' + fold[:3] + '_FORMANT.csv'
+        filepath3 = fold + '/' + fold[:3] + '_mfcc.csv'  
     
         # read audio data
         df_orig = pd.read_csv(''.join([dirpath, filepath]), header=None)
         df_orig2 = pd.read_csv(''.join([dirpath, filepath2]), header=None)
+        df_orig3 = pd.read_csv(''.join([dirpath, filepath3]), header=None)
         #df_orig.head()
         
         fea_list = []
@@ -97,9 +99,13 @@ with open(dirpath + 'audio_fea.csv', 'w') as outfile:
                 fea_list += a_dct(l, 10)
         
         for col in df_orig2:
-            l = df_orig[col].tolist()
+            l = df_orig2[col].tolist()
             fea_list += [a_mean(l), a_sd(l), a_peak_rms(l), a_rms(l), a_iqr(l), a_spectral(l)]
             fea_list += a_dct(l, 10)
+            
+        for col in df_orig3:
+            l = df_orig3[col].tolist()
+            fea_list += [a_mean(l), a_sd(l), a_peak_rms(l), a_rms(l), a_iqr(l), a_spectral(l)]
             
         fea_list = [round(x, 3) for x in fea_list]
         

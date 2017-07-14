@@ -35,7 +35,7 @@ col = 20
 l = df_orig[col].tolist()
 
 dist_list = list()
-for m in range(300, 310, 1):    
+for m in range(309, 310, 1):    
     l_idct = a_dct(l, m)
     
     l2 = idct(l_idct, type = 2, norm = 'ortho')
